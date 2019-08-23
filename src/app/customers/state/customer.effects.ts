@@ -3,9 +3,9 @@ import { Actions, ofType, createEffect } from "@ngrx/effects";
 import { EMPTY, Observable, of, from } from "rxjs";
 import { map, mergeMap, catchError, exhaustMap } from "rxjs/operators";
 import * as fromCustomerActions from "./customer.actions";
-import * as fromCustomerReducer from "./customer.reducer";
+import * as fromCustomer from "./customer.reducer";
 import { CustomerService } from "../customer.service";
-import { Action } from "@ngrx/store";
+import { Action, Store } from "@ngrx/store";
 import { Customer } from "./../customer.model";
 
 @Injectable()
@@ -67,12 +67,29 @@ export class CustomerEffects {
         this.customerService.updateCustomer(customer).pipe(
           map((updateCustomer: Customer) =>
             fromCustomerActions.updateCustomerSuccess({
-              id: updateCustomer.id,
-              changes: updateCustomer
+              customer: { id: updateCustomer.id, changes: updateCustomer }
             })
           ),
           catchError(error =>
             of(fromCustomerActions.updateCustomerFail({ error }))
+          )
+        )
+      )
+    )
+  );
+
+  deleteCustomer$: Observable<Action> = this.actions$.pipe(
+    ofType(fromCustomerActions.deleteCustomer),
+    map(action => action.selectedCustomerId),
+    mergeMap((id: number) =>
+      this.customerService.deleteCustomer(id).pipe(
+        map(
+          () =>
+            fromCustomerActions.deleteCustomerSuccess({
+              selectedCustomerId: id
+            }),
+          catchError(error =>
+            of(fromCustomerActions.deleteCustomerFail({ error }))
           )
         )
       )

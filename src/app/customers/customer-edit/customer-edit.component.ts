@@ -1,11 +1,11 @@
 import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-// import { Store } from "@ngrx/store";
+import { Store } from "@ngrx/store";
 
 import { Observable } from "rxjs";
 
-// import * as customerActions from "../state/customer.actions";
-// import * as fromCustomer from "../state/customer.reducer";
+import * as fromCustomerActions from "../state/customer.actions";
+import * as fromCustomer from "../state/customer.reducer";
 import { Customer } from "../customer.model";
 
 @Component({
@@ -17,7 +17,8 @@ export class CustomerEditComponent implements OnInit {
   customerForm: FormGroup;
 
   constructor(
-    private fb: FormBuilder // private store: Store<fromCustomer.AppState>
+    private fb: FormBuilder,
+    private store: Store<fromCustomer.AppState>
   ) {}
 
   ngOnInit() {
@@ -29,21 +30,21 @@ export class CustomerEditComponent implements OnInit {
       id: null
     });
 
-    // const customer$: Observable<Customer> = this.store.select(
-    //   fromCustomer.getCurrentCustomer
-    // )
+    const customer$: Observable<Customer> = this.store.select(
+      fromCustomer.getCurrentCustomer
+    );
 
-    // customer$.subscribe(currentCustomer => {
-    //   if (currentCustomer) {
-    //     this.customerForm.patchValue({
-    //       name: currentCustomer.name,
-    //       phone: currentCustomer.phone,
-    //       address: currentCustomer.address,
-    //       membership: currentCustomer.membership,
-    //       id: currentCustomer.id
-    //     });
-    //   }
-    // })
+    customer$.subscribe(currentCustomer => {
+      if (currentCustomer) {
+        this.customerForm.patchValue({
+          name: currentCustomer.name,
+          phone: currentCustomer.phone,
+          address: currentCustomer.address,
+          membership: currentCustomer.membership,
+          id: currentCustomer.id
+        });
+      }
+    });
   }
 
   updateCustomer() {
@@ -55,6 +56,9 @@ export class CustomerEditComponent implements OnInit {
       id: this.customerForm.get("id").value
     };
 
+    this.store.dispatch(
+      fromCustomerActions.updateCustomer({ customer: updatedCustomer })
+    );
     // this.store.dispatch(new customerActions.UpdateCustomer(updatedCustomer))
   }
 }

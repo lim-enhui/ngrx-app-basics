@@ -13,6 +13,13 @@
       "address": "893 Main Voulevard",
       "membership": "Pro",
       "id": 2
+    },
+    {
+      "name": "Warner Bruh",
+      "phone": "1234567",
+      "address": "James St",
+      "membership": "Platinum",
+      "id": 3
     }
   ]
 }
